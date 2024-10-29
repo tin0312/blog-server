@@ -26,6 +26,39 @@ async function addPost(req, res) {
   }
 }
 
+async function addReaction(req, res) {
+  const { likeCount, helpfulCount, brilliantCount } = req.body;
+  const { id } = req.params;
+  try {
+    const result = await db.query("SELECT * FROM posts WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    const post = result.rows[0];
+    const newReaction = {
+      likeCount: likeCount || post.likecount,
+      helpfulCount: helpfulCount || post.helpfulcount,
+      brilliantCount: brilliantCount || post.brilliantcount,
+    };
+    try {
+      await db.query(
+        "UPDATE posts SET likecount = $1, helpfulcount= $2, brilliantcount= $3 WHERE id= $4",
+        [
+          newReaction.likeCount,
+          newReaction.helpfulCount,
+          newReaction.brilliantCount,
+          id,
+        ]
+      );
+      res.status(200).json({ message: "Reactions updated" });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating reactions" });
+    }
+  } catch (error) {
+    res.status(400).json({ message: "Error finding post" });
+  }
+}
+
 async function deletePost(req, res) {
   const id = req.params.id;
   try {
@@ -42,7 +75,6 @@ async function updatePost(req, res) {
   try {
     const result = await db.query("SELECT * FROM posts WHERE id = $1", [id]);
     const post = result.rows[0];
-    console.log("Post data found", post);
     const newPostContent = {
       title: title || post.title,
       content: content || post.content,
@@ -99,4 +131,12 @@ async function getUserPosts(req, res) {
   }
 }
 
-export { getAllPosts, addPost, deletePost, updatePost, getPost, getUserPosts };
+export {
+  getAllPosts,
+  addPost,
+  addReaction,
+  deletePost,
+  updatePost,
+  getPost,
+  getUserPosts,
+};
