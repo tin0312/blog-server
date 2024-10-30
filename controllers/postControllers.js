@@ -3,7 +3,7 @@ import db from "../db.js";
 async function getAllPosts(req, res) {
   try {
     const result = await db.query(
-      "SELECT posts.id, posts.content, posts.title, posts.created_at, posts.updated_at, posts.author_username, users.profile_pic_file, users.profile_pic_url FROM posts INNER JOIN users ON posts.author_username = users.username;"
+      "SELECT posts.id, posts.content, posts.title, posts.created_at, posts.updated_at, posts.author_username, posts.likecount, posts.helpfulcount, posts.brilliantcount, users.profile_pic_file, users.profile_pic_url FROM posts INNER JOIN users ON posts.author_username = users.username;"
     );
     res.json(result.rows);
   } catch (error) {
@@ -102,7 +102,7 @@ async function getPost(req, res) {
   const postID = req.params.postID;
   try {
     const result = await db.query(
-      "SELECT posts.id, posts.content, posts.title, posts.created_at, posts.updated_at, posts.author_username, users.profile_pic_file, users.profile_pic_url FROM posts INNER JOIN users ON posts.author_username = users.username WHERE posts.id = $1",
+      "SELECT posts.id, posts.content, posts.title, posts.created_at, posts.updated_at, posts.author_username, posts.likecount, posts.helpfulcount, posts.brilliantcount, users.profile_pic_file, users.profile_pic_url FROM posts INNER JOIN users ON posts.author_username = users.username WHERE posts.id = $1",
       [postID]
     );
     const post = result.rows[0];
