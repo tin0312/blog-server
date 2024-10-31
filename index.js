@@ -19,7 +19,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Initialize redis client.
-let redisClient = redis.createClient();
+let redisClient = redis.createClient({
+  url: process.env.REDIS_URL,
+});
 redisClient.connect().catch(console.error);
 
 // Initialize redis store.
